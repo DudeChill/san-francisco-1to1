@@ -42,11 +42,18 @@ cd san-francisco-1to1
 
 (No Git? Download and extract the repo ZIP from the GitHub Code button.)
 
-**2. Get Godot 4.7** — from [godotengine.org/download](https://godotengine.org/download),
-choose **Godot Engine → Standard** (not .NET), Windows → 64-bit. Unzip anywhere,
-e.g. `C:\Godot\Godot_v4.7-stable_win64.exe`. Windows SmartScreen may prompt on
-first run ("More info" → "Run anyway") — the binary is the official unsigned
-Godot build.
+**2. Get Godot 4.7** — either download **Godot Engine → Standard** (not .NET),
+Windows → 64-bit from [godotengine.org/download](https://godotengine.org/download)
+and unzip anywhere, or paste this PowerShell block which does it for you
+(SmartScreen may prompt on first run — the binary is the official unsigned
+Godot build):
+
+```powershell
+$v = "4.7.2-stable"
+Invoke-WebRequest "https://github.com/godotengine/godot/releases/download/$v/Godot_v${v}_win64.exe.zip" -OutFile "$env:TEMP\godot.zip"
+Expand-Archive "$env:TEMP\godot.zip" "C:\Godot" -Force
+$godot = "C:\Godot\Godot_v${v}_win64.exe"
+```
 
 **3. Import assets (two passes, PowerShell):**
 
