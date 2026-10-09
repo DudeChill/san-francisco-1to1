@@ -1,0 +1,5 @@
+.godot/
+data_raw/
+*.tmp
+__pycache__/
+*.pyc
