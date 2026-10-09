@@ -26,6 +26,68 @@ gets `valid=false` stuck in its `.import` file and is never retried. Deleting
 the `.import` files between the two passes forces a real import pass once
 textures exist. `tools/visual_check.sh` automates desktop screenshots.
 
+## Install on Windows 10/11
+
+You need a GPU with **Vulkan** support (GTX 1060 / RX 580 class or newer —
+the 60 fps target assumes RTX 3060-class). Godot itself is a portable exe,
+no installer.
+
+**1. Get the project** (~750 MB clone; the baked city ships with the repo, no
+bake required):
+
+```powershell
+git clone https://github.com/DudeChill/san-francisco-1to1.git
+cd san-francisco-1to1
+```
+
+(No Git? Download and extract the repo ZIP from the GitHub Code button.)
+
+**2. Get Godot 4.7** — from [godotengine.org/download](https://godotengine.org/download),
+choose **Godot Engine → Standard** (not .NET), Windows → 64-bit. Unzip anywhere,
+e.g. `C:\Godot\Godot_v4.7-stable_win64.exe`. Windows SmartScreen may prompt on
+first run ("More info" → "Run anyway") — the binary is the official unsigned
+Godot build.
+
+**3. Import assets (two passes, PowerShell):**
+
+```powershell
+$godot = "C:\Godot\Godot_v4.7-stable_win64.exe"   # adjust to your path
+
+& $godot --headless --path . --import
+Remove-Item data\tiles\*.import, data\props\*.import
+& $godot --headless --path . --import
+```
+
+Pass 1 imports textures; the glTF scene import defers and leaves stub
+`.import` files that never retry on their own — deleting them forces pass 2
+to actually import the ~5.8k tile scenes (~5–10 min on first run).
+
+**4. Play:**
+
+```powershell
+& $godot --path .
+```
+
+First launch compiles shaders and may hitch for a few seconds. Optional
+headless self-test (should print `SMOKE: PASS`):
+
+```powershell
+& $godot --headless --path . --script tests/smoke.gd
+```
+
+**Optional — re-bake the city from scratch** (only if you want to regenerate
+tiles from fresh OSM data; needs Python 3.10+ from python.org, tick
+"Add python.exe to PATH" in the installer):
+
+```powershell
+python -m pip install numpy pillow shapely
+python pipeline\run_all.py     # fetches OSM + DEM, bakes all tiles (long)
+python pipeline\verify_bake.py # must print VERIFY OK
+```
+
+…then re-run the two-pass import from step 3. The pipeline is pure
+cross-platform Python (stdlib + numpy/Pillow/shapely) — no WSL needed.
+
 ## Environment switches (verification / debugging)
 
 | Var | Effect |
